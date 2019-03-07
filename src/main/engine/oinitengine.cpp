@@ -29,6 +29,7 @@
 #include "engine/otiles.hpp"
 #include "engine/otraffic.hpp"
 #include "engine/oinitengine.hpp"
+#include "realdash/realdashclient.hpp"
 
 OInitEngine oinitengine;
 
@@ -115,8 +116,8 @@ void OInitEngine::setup_stage1()
     ostats.score = 0;
     ostats.clear_stage_times();
     oferrari.reset_car();               // Reset Car Speed/Rev Values
-    outrun.outputs->set_digital(OOutputs::D_EXT_MUTE);
-    outrun.outputs->set_digital(OOutputs::D_SOUND);
+    // [ND] outrun.outputs->set_digital(OOutputs::D_EXT_MUTE);
+    // [ND] outrun.outputs->set_digital(OOutputs::D_SOUND);
     osoundint.engine_data[sound::ENGINE_VOL] = 0x3F;
     ostats.extend_play_timer = 0;
     checkpoint_marker = 0;              // Denote not past checkpoint marker
@@ -282,13 +283,23 @@ void OInitEngine::update_engine()
     set_fine_position();
 
     // Draw Speed & Hud Stuff
-    if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_BONUS)
+    if (outrun.game_state >= GS_ATTRACT && outrun.game_state <= GS_BONUS)
     {
+        // ND: Disable HUD speed since we have it in RealDash
+        /*
         // Convert & Blit Car Speed
         ohud.blit_speed(0x110CB6, car_increment >> 16);
         ohud.blit_text1(HUD_KPH1);
         ohud.blit_text1(HUD_KPH2);
+        */
+        
+        // ND: Convert speed to MPH for RealDash
+        uint32_t kph = car_increment >> 16;
+        uint32_t mph = kph * 6214 / 10000;
+        realDashCanClient.updateSpeed(uint16_t(mph));
 
+        // ND: Disable HUD Gear indicator since we have it in RealDash
+        /*
         // Blit High/Low Gear
         if ((config.controls.gear == config.controls.GEAR_BUTTON ||
             config.controls.gear == config.controls.GEAR_SEPARATE)
@@ -299,6 +310,7 @@ void OInitEngine::update_engine()
             else
                 ohud.blit_text_new(9, 26, "L", OHud::GREY);
         }
+         */
 
         if (config.engine.layout_debug)
             ohud.draw_debug_info(oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());
@@ -766,7 +778,6 @@ void OInitEngine::init_split_next_level()
     ostats.cur_stage++;
     oroad.stage_lookup_off += 8;    // Increment lookup to next block of stages
     ostats.route_info += 0x10;      // Route Info increments by 10 at each stage
-    ohud.do_mini_map();
     init_road_seg_master();
 
     // Clear sprite palette lookup

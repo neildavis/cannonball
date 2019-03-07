@@ -19,6 +19,7 @@
 #include "engine/ohud.hpp"
 #include "engine/ooutputs.hpp"
 #include "engine/ostats.hpp"
+#include "realdash/realdashclient.hpp"
 
 OHud ohud;
 
@@ -36,19 +37,17 @@ OHud::~OHud(void)
 // Source: 0xB462
 void OHud::draw_main_hud()
 {
-    blit_text1(HUD_LAP1);
-    blit_text1(HUD_LAP2);
+    blit_text1(16, 1, HUD_LAP1);
+    blit_text1(16, 2, HUD_LAP2);
 
     if (outrun.cannonball_mode == Outrun::MODE_ORIGINAL)
     {
-        blit_text1(HUD_TIME1);
-        blit_text1(HUD_TIME2);
-        blit_text1(HUD_SCORE1);
-        blit_text1(HUD_SCORE2);
-        blit_text1(HUD_STAGE1);
-        blit_text1(HUD_STAGE2);
-        blit_text1(HUD_ONE);
-        do_mini_map();
+        blit_text1(2, 1, HUD_SCORE1);
+        blit_text1(2, 2, HUD_SCORE2);
+        
+        blit_text1(31, 1, HUD_STAGE1);
+        blit_text1(31, 2, HUD_STAGE2);
+        blit_text1(37, 2, HUD_ONE);
     }
     else if (outrun.cannonball_mode == Outrun::MODE_TTRIAL)
     {
@@ -144,17 +143,41 @@ void OHud::draw_mini_map(uint32_t tile_addr)
 // Source: 0x8216
 void OHud::draw_timer1(uint16_t time)
 {
-    if (outrun.game_state < GS_START1 || outrun.game_state > GS_INGAME)
-        return;
-
-    if (!outrun.freeze_timer)
+    if (outrun.game_state < GS_INIT_BEST1)
     {
-        const uint16_t BASE_TILE = 0x8C80;
-        draw_timer2(time > 0x99 ? 0x99 : time, 0x1100BE, BASE_TILE);
+        // ND: Fuel in attract mode based on attract mode duration
+        uint16_t start_time_secs = config.engine.new_attract ? 0x80 : 0x15;
+        uint16_t remain_time_secs = ostats.time_counter;
+        uint16_t fuel_percent = std::min(100, remain_time_secs * 100 / start_time_secs);
+        realDashCanClient.updateFuel(fuel_percent);
+    }
+    else if (outrun.game_state < GS_INIT_MUSIC || outrun.game_state > GS_INGAME)
+    {
+        // ND: Fuel 0% in RealDash in pre & post game modes (hi-scores)
+        realDashCanClient.updateFuel(0);
+    }
+    else if (outrun.game_state < GS_START1)
+    {
+        // ND: Fuel 100% in RealDash during start & music screen;
+        realDashCanClient.updateFuel(100);
+    }
+    else if (!outrun.freeze_timer)
+    {
+        
+        //const uint16_t BASE_TILE = 0x8C80;
+        //draw_timer2(time, 0x1100BE, BASE_TILE);
+        
+        // ND: Fuel level proportioal to time.
+        // ND: time counter is in 2 nibble BCD. Fuel calulation is remaining time as percent of starting time
+        uint16_t start_time_counter = ostats.TIME[config.engine.dip_time * 40]; // time to begin level with
+        uint16_t start_time_secs = (start_time_counter >> 4) * 10 + (start_time_counter & 0xf);
+        uint16_t remain_time_secs = (time >> 4) * 10 + (time & 0xf);
+        uint16_t fuel_percent = std::min(100, remain_time_secs * 100 / start_time_secs);
+        realDashCanClient.updateFuel(fuel_percent);
 
         // Blank out the OFF text area
-        video.write_text16(0x110C2, 0);
-        video.write_text16(0x110C2 + 0x80, 0);
+        //video.write_text16(0x110C2, 0);
+        //video.write_text16(0x110C2 + 0x80, 0);
     }
     else
     {
@@ -229,7 +252,7 @@ void OHud::draw_score_ingame(uint32_t score)
     if (outrun.game_state < GS_START1 || outrun.game_state > GS_BONUS)
         return;
 
-    draw_score(0x110150, score, 2);
+    draw_score(translate(7, 2), score, 2);
 }
 
 // Draw Score
@@ -342,13 +365,23 @@ void OHud::draw_stage_number(uint32_t addr, uint8_t digit, uint16_t col)
 void OHud::draw_rev_counter()
 {
     // Return in attract mode and don't draw rev counter
-    if (outrun.game_state <= GS_INIT_GAME) return;
-    uint16_t revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
+    // ND: We're not drawing it anyway, but let's have it active in RealDash during attract
+    uint16_t revs = 0;
+    if (outrun.game_state == GS_ATTRACT ||
+        (outrun.game_state >= GS_START1 && outrun.game_state <= GS_INGAME))
+    {
+        revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
+    }
     
     // Boost revs during countdown phase, so the bar goes further into the red
     if (oinitengine.car_increment >> 16 == 0)
         revs += (revs >> 2);
 
+    // ND: revs is normally 0-255, but boosted by 1/4 (0-319) during countdown
+    uint16_t mappedRevs = outils::map(revs, 0, 319, 0, RD_MAX_REVS_RPM);
+    realDashCanClient.updateRevs(mappedRevs);
+    
+    /*
     revs >>= 4;
 
     uint32_t addr = 0x110DB4; // Address of rev counter
@@ -390,6 +423,7 @@ void OHud::draw_rev_counter()
         if (i & 1)
             addr += 2;
     }
+     */
     oferrari.rev_pitch2 = oferrari.rev_pitch1;
 }
 
@@ -475,12 +509,12 @@ void OHud::draw_insert_coin()
             if (outrun.tick_counter & BIT_4)
             {
                 blit_text1(TEXT1_PRESS_START);
-                outrun.outputs->set_digital(OOutputs::D_START_LAMP);
+                // [ND] outrun.outputs->set_digital(OOutputs::D_START_LAMP);
             }
             else
             {
                 blit_text1(TEXT1_CLEAR_START);
-                outrun.outputs->clear_digital(OOutputs::D_START_LAMP);
+                // [ND] outrun.outputs->clear_digital(OOutputs::D_START_LAMP);
             }
         }
         // Flash Insert Coins / Freeplay Press Start
@@ -729,8 +763,6 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
         // Convert lowercase characters to uppercase
         if (c >= 'a' && c <= 'z')
             c -= 0x20;
-        else if (c == '©')
-            c = 0x10;
         else if (c == '-')
             c = 0x2d;
         else if (c == '.')

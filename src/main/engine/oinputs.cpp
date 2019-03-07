@@ -14,6 +14,8 @@
 #include "engine/oinputs.hpp"
 #include "engine/ostats.hpp"
 
+#include "realdash/realdashclient.hpp"
+
 OInputs oinputs;
 
 OInputs::OInputs(void)
@@ -64,13 +66,17 @@ void OInputs::tick()
         // Analog Pedals
         if (input.analog == 1)
         {
+            /* ND
             input_acc      = input.a_accel;
             input_brake    = input.a_brake;
+            */
+           gear_pedals();   // ND:
         }
         // Digital Pedals
         else
         {
-            digital_pedals();
+            //digital_pedals();
+            gear_pedals(); // ND:
         }
     }
 }
@@ -148,6 +154,48 @@ void OInputs::digital_pedals()
     }
 }
 
+// ND: Accelerate/Brake via pedals
+void OInputs::gear_pedals()
+{
+    // ------------------------------------------------------------------------
+    // ACCELERATION
+    // ------------------------------------------------------------------------
+    
+    if (input.is_pressed(Input::GEAR1) || input.is_pressed(Input::GEAR2))
+    {
+        input_acc += acc_inc;
+        if (input_acc > 0xFF) input_acc = 0xFF;
+        
+        input_brake -= brake_inc;
+        if (input_brake < 0) input_brake = 0;
+    }
+    else
+    {
+        input_acc -= acc_inc;
+        if (input_acc < 0) input_acc = 0;
+        
+        input_brake += brake_inc;
+        if (input_brake > 0xFF) input_brake = 0xFF;
+    }
+    
+    // ------------------------------------------------------------------------
+    // BRAKE
+    // ------------------------------------------------------------------------
+    
+    /* NO BREAKING
+     if (input.is_pressed(Input::BRAKE))
+     {
+     input_brake += brake_inc;
+     if (input_brake > 0xFF) input_brake = 0xFF;
+     }
+     else
+     {
+     input_brake -= brake_inc;
+     if (input_brake < 0) input_brake = 0;
+     }
+     */
+}
+
 void OInputs::do_gear()
 {
     // ------------------------------------------------------------------------
@@ -155,9 +203,12 @@ void OInputs::do_gear()
     // ------------------------------------------------------------------------
 
     // Automatic Gears: Don't do anything
-    if (config.controls.gear == config.controls.GEAR_AUTO)
-        return;
-
+    if (FORCE_AI ||
+        outrun.game_state == GS_ATTRACT || outrun.game_state == GS_BONUS ||
+        config.controls.gear == config.controls.GEAR_AUTO)
+    {
+        gear = (oinitengine.car_increment >> 16 > 0xA0);
+    }
     else
     {
         // Manual: Cabinet Shifter
@@ -179,6 +230,20 @@ void OInputs::do_gear()
             if (input.has_pressed(Input::GEAR1))
                 gear = !gear;
         }
+    }
+    
+    // RealDash integration
+    switch (outrun.game_state)
+    {
+        case GS_ATTRACT:
+        case GS_START1:
+        case GS_START2:
+        case GS_START3:
+        case GS_INGAME:
+            realDashCanClient.updateGear(gear ? 2 : 1); // 1 = Low, 2 = High
+            break;
+        default:
+            realDashCanClient.updateGear(0); // 0 = Neutral
     }
 }
 

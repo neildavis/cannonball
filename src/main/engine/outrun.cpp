@@ -30,6 +30,7 @@
 #include "engine/otiles.hpp"
 #include "engine/otraffic.hpp"
 #include "engine/outils.hpp"
+#include "realdash/realdashclient.hpp"
 
 Outrun outrun;
 
@@ -73,6 +74,7 @@ void Outrun::init()
 
     tick_counter = 0;
 
+    /* ND
     if (config.smartypi.enabled)
     {
         outputs->set_mode(OOutputs::MODE_CABINET);
@@ -86,6 +88,7 @@ void Outrun::init()
         outputs->set_mode(OOutputs::MODE_FFEEDBACK);
     else if (config.controls.rumble)
         outputs->set_mode(OOutputs::MODE_RUMBLE);
+    */
 
     boot();
 }
@@ -166,8 +169,10 @@ void Outrun::tick(bool tick_frame)
     if (tick_frame)
     {
         uint8_t coin = oinputs.do_credits();
+        /* ND:
         outputs->coin_chute_out(&outputs->chute1, coin == 1);
         outputs->coin_chute_out(&outputs->chute2, coin == 2);
+        */
     }
 
     // Draw FPS
@@ -274,6 +279,7 @@ void Outrun::jump_table()
     osprites.sprite_copy();
 
     // Motor Code
+    /* ND: Not needed
     if (tick_frame)
     {
         if (game_state == GS_CALIBRATE_MOTOR)
@@ -290,13 +296,14 @@ void Outrun::jump_table()
             }
 
             outputs->tick(input.a_motor);
-        }
+         }
         else
         {
             int16_t motor = (config.smartypi.enabled && config.smartypi.cabinet == Config::CABINET_MOVING) ? input.a_motor : oinputs.input_steering;
             outputs->tick(motor);
         }
     }
+    */
 }
 
 // Source: 0xB15E
@@ -497,6 +504,7 @@ void Outrun::main_switch()
                 ohud.blit_text_new(31, 18, Utils::to_string((int) ttrial.crashes).c_str(), OHud::GREEN);
             }
             osoundint.queue_sound(sound::NEW_COMMAND);
+            realDashCanClient.resetDefaults();
             game_state = GS_GAMEOVER;
 
         case GS_GAMEOVER:

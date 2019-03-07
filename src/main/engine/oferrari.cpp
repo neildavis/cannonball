@@ -566,12 +566,12 @@ void OFerrari::set_ferrari_palette()
     // Denote palette for brake light
     if (oinputs.brake_adjust >= OInputs::BRAKE_THRESHOLD1)
     {
-        outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
+        // [ND] outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
         pal = 2;
     }
     else
     {
-        outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
+        // [ND] outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
         pal = 0;
     }
 
@@ -993,15 +993,6 @@ void OFerrari::move()
         // Auto braking if necessary
         if (outrun.game_state != GS_ATTRACT && auto_brake)
             oinputs.acc_adjust = 0;   
-
-        // Set Gear For Demo Mode
-        if (FORCE_AI || 
-            outrun.game_state == GS_ATTRACT || outrun.game_state == GS_BONUS || 
-            config.controls.gear == config.controls.GEAR_AUTO)
-        {
-            // demo_mode_gear
-            oinputs.gear = (oinitengine.car_increment >> 16 > 0xA0);
-        }
 
         gfx_smoke = 0;
 

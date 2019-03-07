@@ -196,6 +196,11 @@ set(src_engine_audio
     "${main_cpp_base}/engine/audio/osoundint.cpp"
     )
 
+set(src_realdash
+    "${main_cpp_base}/realdash/realdashclient.hpp"
+    "${main_cpp_base}/realdash/realdashclient.cpp"
+    )
+
 set(SRCS
     ${src_main}
     ${src_frontend}
@@ -207,6 +212,7 @@ set(SRCS
     ${src_engine}
     ${src_engine_data}
     ${src_engine_audio}
+    ${src_realdash}
 )
 
 # Group files into relevant filters for Visual Studio build
@@ -220,6 +226,7 @@ SOURCE_GROUP(src\\directx FILES ${src_directx})
 SOURCE_GROUP(src\\engine FILES ${src_engine})
 SOURCE_GROUP(src\\engine\\data FILES ${src_engine_data})
 SOURCE_GROUP(src\\engine\\audio FILES ${src_engine_audio})
+SOURCE_GROUP(src\\realdash FILES ${src_realdash})
 
 # Add Icon For Windows Builds
 if(WIN32)
@@ -257,6 +264,7 @@ include_directories(
     ${main_cpp_base}
     ${BOOST_INCLUDEDIR}
     ${SDL2_INCLUDE_DIRS}
+    ${platform_include_dirs}
 )
 
 link_directories(

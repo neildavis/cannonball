@@ -29,6 +29,8 @@
 #include "engine/ooutputs.hpp"
 #include "engine/omusic.hpp"
 
+#include "realdash/realdashclient.hpp"
+
 // Direct X Haptic Support.
 // Fine to include on non-windows builds as dummy functions used.
 #include "directx/ffeedback.hpp"
@@ -61,6 +63,8 @@ static void quit_func(int code)
     forcefeedback::close();
     delete menu;
     SDL_Quit();
+    // Stop RealDash CAN Server
+    realDashCanClient.stopServer();
     exit(code);
 }
 
@@ -193,18 +197,19 @@ static void tick()
 
         case STATE_INIT_MENU:
             oinputs.init();
-            outrun.outputs->init();
+            // ND: outrun.outputs->init();
             menu->init();
             state = STATE_MENU;
             break;
     }
 
     // Map OutRun outputs to CannonBall devices (SmartyPi Interface / Controller Rumble)
-    outrun.outputs->writeDigitalToConsole();
+    /* ND: outrun.outputs->writeDigitalToConsole();
     if (tick_frame)
     {
          input.set_rumble(outrun.outputs->is_set(OOutputs::D_MOTOR), config.controls.rumble);
     }
+    */
 }
 
 static void main_loop()
@@ -341,6 +346,8 @@ int main(int argc, char* argv[])
     // Populate menus
     menu = new Menu();
     menu->populate();
+    // Start RealDash CAN Server
+    realDashCanClient.startServer();
     main_loop();  // Loop until we quit the app
 
     // Never Reached

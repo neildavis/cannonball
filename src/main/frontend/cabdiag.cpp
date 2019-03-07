@@ -127,9 +127,10 @@ bool CabDiag::tick()
                 uint8_t limit = (input.motor_limits[Input::SW_LEFT]   ? 0 : BIT_5) |
                                 (input.motor_limits[Input::SW_CENTRE] ? 0 : BIT_4) |
                                 (input.motor_limits[Input::SW_RIGHT]  ? 0 : BIT_3);
-
+                /* ND
                 press_start_to_exit = outrun.outputs->diag_motor(input.a_motor, limit);
                 outrun.outputs->writeDigitalToConsole();
+                */
             }
             break;
     }
@@ -166,21 +167,15 @@ void CabDiag::tick_output()
     {
         ohud.blit_text_new(24, 6, " ON", 0x80);
         ohud.blit_text_new(24, 7, " ON", 0x80);
-        outrun.outputs->set_digital(OOutputs::D_START_LAMP);
-        outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
     }
     else
     {
         ohud.blit_text_new(24, 6, "OFF", 0x86);
         ohud.blit_text_new(24, 7, "OFF", 0x86);
-        outrun.outputs->clear_digital(OOutputs::D_START_LAMP);
-        outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
     }
 
     if (done)
     {
-        outrun.outputs->clear_digital(OOutputs::D_START_LAMP);
-        outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
     }
 }
 
@@ -325,19 +320,20 @@ void CabDiag::tick_motor()
     if (counter & BIT_5)
     {
         ohud.blit_text_new(24, 6, " ON", 0x80);
-        outrun.outputs->set_digital(OOutputs::D_MOTOR);
+        // ND: outrun.outputs->set_digital(OOutputs::D_MOTOR);
     }
     else
     {
         ohud.blit_text_new(24, 6, "OFF", 0x86);
-        outrun.outputs->clear_digital(OOutputs::D_MOTOR);
+        // ND: outrun.outputs->clear_digital(OOutputs::D_MOTOR);
     }
 
     if (done)
-    {
+    {   /* ND:
         outrun.outputs->clear_digital(OOutputs::D_MOTOR);
         outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
+        */
     }
 
-    outrun.outputs->writeDigitalToConsole();
+    // ND: outrun.outputs->writeDigitalToConsole();
 }
