@@ -288,9 +288,9 @@ void OInitEngine::update_engine()
         ohud.blit_text1(HUD_KPH2);
         
         // ND:
-        uint16_t kph = car_increment >> 16;
-        uint16_t mph = kph * 0.621371;
-        realDashCanClient.updateSpeed(mph);
+        uint32_t kph = car_increment >> 16;
+        uint32_t mph = kph * 6214 / 10000;
+        realDashCanClient.updateSpeed(uint16_t(mph));
 
         // Blit High/Low Gear
         if (config.controls.gear == config.controls.GEAR_BUTTON && !config.cannonboard.enabled)

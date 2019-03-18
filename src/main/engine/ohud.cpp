@@ -354,8 +354,6 @@ void OHud::draw_rev_counter()
     uint16_t mappedRevs = outils::map(revs, 0, 319, 0, RD_MAX_REVS_RPM);
     realDashCanClient.updateRevs(mappedRevs);
     
-    //blit_text_new(0, 7, Utils::to_string(revs).c_str(), OHud::GREEN);
-    
     revs >>= 4;
 
     uint32_t addr = 0x110DB4; // Address of rev counter
