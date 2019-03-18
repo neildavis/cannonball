@@ -19,6 +19,7 @@
 #include "engine/ohud.hpp"
 #include "engine/ooutputs.hpp"
 #include "engine/ostats.hpp"
+#include "realdash/realdashclient.hpp"
 
 OHud ohud;
 
@@ -344,11 +345,17 @@ void OHud::draw_rev_counter()
     // Return in attract mode and don't draw rev counter
     if (outrun.game_state <= GS_INIT_GAME) return;
     uint16_t revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
-    
+
     // Boost revs during countdown phase, so the bar goes further into the red
     if (oinitengine.car_increment >> 16 == 0)
         revs += (revs >> 2);
 
+    // ND: revs is normally 0-255, but boosted by 1/4 (0-319) during countdown
+    uint16_t mappedRevs = outils::map(revs, 0, 319, 0, RD_MAX_REVS_RPM);
+    realDashCanClient.updateRevs(mappedRevs);
+    
+    //blit_text_new(0, 7, Utils::to_string(revs).c_str(), OHud::GREEN);
+    
     revs >>= 4;
 
     uint32_t addr = 0x110DB4; // Address of rev counter
@@ -729,8 +736,6 @@ void OHud::blit_text_new(uint16_t x, uint16_t y, const char* text, uint16_t pal)
         // Convert lowercase characters to uppercase
         if (c >= 'a' && c <= 'z')
             c -= 0x20;
-        else if (c == '©')
-            c = 0x10;
         else if (c == '-')
             c = 0x2d;
         else if (c == '.')

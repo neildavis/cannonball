@@ -11,6 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//
+// Constants
+//
+const uint16_t RD_MAX_REVS_RPM = 9000;
+
 // Client DBus config
 #define CANNONBALL_DBUS_SERVICE_NAME "nd.cannonball.main"
 // RealDashCanServerQt DBus config

@@ -29,6 +29,7 @@
 #include "engine/otiles.hpp"
 #include "engine/otraffic.hpp"
 #include "engine/oinitengine.hpp"
+#include "realdash/realdashclient.hpp"
 
 OInitEngine oinitengine;
 
@@ -285,6 +286,11 @@ void OInitEngine::update_engine()
         ohud.blit_speed(0x110CB6, car_increment >> 16);
         ohud.blit_text1(HUD_KPH1);
         ohud.blit_text1(HUD_KPH2);
+        
+        // ND:
+        uint16_t kph = car_increment >> 16;
+        uint16_t mph = kph * 0.621371;
+        realDashCanClient.updateSpeed(mph);
 
         // Blit High/Low Gear
         if (config.controls.gear == config.controls.GEAR_BUTTON && !config.cannonboard.enabled)

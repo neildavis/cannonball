@@ -11,6 +11,12 @@
 
 #include <stdint.h>
 
+//
+// Constants
+//
+/** Maximum revs */
+extern const uint16_t RD_MAX_REVS_RPM;
+
 // Forward declarations
 struct DBusConnection;
 
