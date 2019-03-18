@@ -28,11 +28,18 @@ endif(TARGET)
 set(BOOST_INCLUDEDIR ${lib_base}/boost_1_54_0)
 find_package(Boost REQUIRED)
 
+find_package(PkgConfig) # Include functions provided by PkgConfig module.
+
+pkg_check_modules(DBUS dbus-1) # This calls pkgconfig with appropriate arguments
+
 # Include
 include_directories(
     "${main_cpp_base}"
     "${BOOST_INCLUDEDIR}"
+    "${DBUS_INCLUDE_DIRS}"
 )
+# link
+link_directories(${DBUS_LIBRARY_DIRS})
 
 # Create compile time setup
 file(WRITE ${main_cpp_base}/setup.hpp 
@@ -257,6 +264,11 @@ set(src_engine_audio
     "${main_cpp_base}/engine/audio/osoundint.cpp"
     )
 
+set(src_realdash
+    "${main_cpp_base}/realdash/realdashclient.hpp"
+    "${main_cpp_base}/realdash/realdashclient.cpp"
+    )
+
 # Group files into relevant filters for Visual Studio build
 SOURCE_GROUP(src FILES ${src_main})
 SOURCE_GROUP(src\\frontend FILES ${src_frontend})
@@ -267,6 +279,7 @@ SOURCE_GROUP(src\\directx FILES ${src_directx})
 SOURCE_GROUP(src\\cannonboard FILES ${src_cannonboard})
 SOURCE_GROUP(src\\engine FILES ${src_engine})
 SOURCE_GROUP(src\\engine\\audio FILES ${src_engine_audio})
+SOURCE_GROUP(src\\realdash FILES ${src_realdash})
 
 set(SRCS
     ${src_main}
@@ -278,6 +291,7 @@ set(SRCS
     ${src_cannonboard}
     ${src_engine}
     ${src_engine_audio}
+    ${src_realdash}
 )
 
 # Add Icon For Windows Builds
@@ -298,6 +312,7 @@ if(CANNONBOARD)
 endif()
 
 add_executable(cannonball ${SRCS})
+target_link_libraries(cannonball ${DBUS_LIBRARIES})
 
 # Copy Configuration file to current build
 
