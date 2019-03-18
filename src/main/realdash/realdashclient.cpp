@@ -59,6 +59,16 @@ RealDashCanClient::~RealDashCanClient() {
     dbus_connection_close(m_conn);
 }
 
+/** Start CAN server */
+void RealDashCanClient::startServer() {
+    dbusMethodCallSync("startServer");
+}
+
+/** Stop CAN server */
+void RealDashCanClient::stopServer() {
+    dbusMethodCallSync("stopServer");
+}
+
 /** Update Rev Counter RPM */
 void RealDashCanClient::updateRevs(uint16_t revsRpm) {
     dbusMethodCallUint16("setRevs", revsRpm);
@@ -82,6 +92,36 @@ void RealDashCanClient::updateGear(char gear) {
 //
 // Private methods
 //
+
+void RealDashCanClient::dbusMethodCallSync(const char *methodName) {
+    DBusMessage* msg = dbus_message_new_method_call(CAN_SERVER_SERVICE_NAME, // target for the method call
+                                       CAN_SERVER_OBJECT_PATH, // object to call on
+                                       CAN_SERVER_INTERFACE, // interface to call on
+                                       methodName); // method name
+    if (NULL == msg) {
+        fprintf(stderr, "Message Null\n");
+        exit(1);
+    }
+    
+    // send message and get a handle for a reply
+    DBusPendingCall* pending = nullptr;
+    if (!dbus_connection_send_with_reply (m_conn, msg, &pending, -1)) {
+        fprintf(stderr, "Out Of Memory!\n");
+        exit(1);
+    }
+    if (NULL == pending) {
+        fprintf(stderr, "Pending Call Null\n");
+        exit(1);
+    }
+    dbus_connection_flush(m_conn);
+    
+    // free message
+    dbus_message_unref(msg);
+    // block until we receive a reply
+    dbus_pending_call_block(pending);
+    // free the pending message handle
+    dbus_pending_call_unref(pending);
+}
 
 void RealDashCanClient::dbusMethodCallUint16(const char *methodName, uint16_t value) {
     DBusMessage* msg;
@@ -113,3 +153,4 @@ void RealDashCanClient::dbusMethodCallUint16(const char *methodName, uint16_t va
     // free message
     dbus_message_unref(msg);
 }
+

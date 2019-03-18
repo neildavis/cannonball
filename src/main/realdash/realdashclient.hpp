@@ -28,6 +28,12 @@ public:
     /** d'tor */
     ~RealDashCanClient();
     
+    /** Start CAN server */
+    void startServer();
+    
+    /** Stop CAN server */
+    void stopServer();
+
     /** Update Rev Counter RPM */
     void updateRevs(uint16_t revsRpm);
     
@@ -41,6 +47,7 @@ public:
     void updateGear(char gear);
     
 private:
+    void dbusMethodCallSync(const char *methodName);
     void dbusMethodCallUint16(const char *methodName, uint16_t value);
     
 private:

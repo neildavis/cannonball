@@ -41,6 +41,8 @@
 #include "engine/ooutputs.hpp"
 #include "engine/omusic.hpp"
 
+#include "realdash/realdashclient.hpp"
+
 // Direct X Haptic Support.
 // Fine to include on non-windows builds as dummy functions used.
 #include "directx/ffeedback.hpp"
@@ -70,6 +72,8 @@ static void quit_func(int code)
     forcefeedback::close();
     delete menu;
     SDL_Quit();
+    // Stop RealDash CAN Server
+    realDashCanClient.stopServer();
     exit(code);
 }
 
@@ -334,6 +338,10 @@ int main(int argc, char* argv[])
 
         // Populate menus
         menu->populate();
+        
+        // Start RealDash CAN Server
+        realDashCanClient.startServer();
+        
         main_loop();  // Loop until we quit the app
     }
     else
