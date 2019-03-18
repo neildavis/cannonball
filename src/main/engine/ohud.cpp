@@ -152,6 +152,13 @@ void OHud::draw_timer1(uint16_t time)
     {
         const uint16_t BASE_TILE = 0x8C80;
         draw_timer2(time, 0x1100BE, BASE_TILE);
+        
+        // ND: time counter is in 2 nibble BCD. Fuel calulation is remaining time as percent of starting time
+        uint16_t start_time_counter = ostats.TIME[config.engine.dip_time * 40]; // time to begin level with
+        uint16_t start_time_secs = (start_time_counter >> 4) * 10 + (start_time_counter & 0xf);
+        uint16_t remain_time_secs = (time >> 4) * 10 + (time & 0xf);
+        uint16_t fuel_percent = std::min(100, remain_time_secs * 100 / start_time_secs);
+        realDashCanClient.updateFuel(fuel_percent);
 
         // Blank out the OFF text area
         video.write_text16(0x110C2, 0);

@@ -71,22 +71,34 @@ void RealDashCanClient::stopServer() {
 
 /** Update Rev Counter RPM */
 void RealDashCanClient::updateRevs(uint16_t revsRpm) {
-    dbusMethodCallUint16("setRevs", revsRpm);
+    if (revsRpm != m_revsRpm) {
+        dbusMethodCallUint16("setRevs", revsRpm);
+        m_revsRpm = revsRpm;
+    }
 }
 
 /** Update Speed MPH */
 void RealDashCanClient::updateSpeed(uint16_t speedMph) {
-    dbusMethodCallUint16("setSpeed", speedMph);
+    if (m_speedMph != speedMph) {
+        dbusMethodCallUint16("setSpeed", speedMph);
+        m_speedMph = speedMph;
+    }
 }
 
 /** Update Fuel Level % */
 void RealDashCanClient::updateFuel(uint16_t fuelPercent) {
-    dbusMethodCallUint16("setFuelLevel", fuelPercent);
+    if (m_fuelPercent != fuelPercent) {
+        dbusMethodCallUint16("setFuelLevel", fuelPercent);
+        m_fuelPercent = fuelPercent;
+    }
 }
 
 /** Update Gear */
 void RealDashCanClient::updateGear(char gear) {
-    
+    if (m_gear != gear) {
+        // TODO: Send gear
+        m_gear = gear;
+    }
 }
 
 //

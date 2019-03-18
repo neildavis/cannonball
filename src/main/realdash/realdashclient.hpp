@@ -52,6 +52,11 @@ private:
     
 private:
     DBusConnection *m_conn;
+    // Internal cached data values
+    uint16_t m_revsRpm;
+    uint16_t m_speedMph;
+    uint16_t m_fuelPercent;
+    char m_gear;
 };
 
 extern RealDashCanClient realDashCanClient;
