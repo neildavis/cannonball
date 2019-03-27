@@ -986,15 +986,6 @@ void OFerrari::move()
         if (outrun.game_state != GS_ATTRACT && auto_brake)
             oinputs.acc_adjust = 0;   
 
-        // Set Gear For Demo Mode
-        if (FORCE_AI || 
-            outrun.game_state == GS_ATTRACT || outrun.game_state == GS_BONUS || 
-            config.controls.gear == config.controls.GEAR_AUTO)
-        {
-            // demo_mode_gear
-            oinputs.gear = (oinitengine.car_increment >> 16 > 0xA0);
-        }
-
         gfx_smoke = 0;
 
         // --------------------------------------------------------------------

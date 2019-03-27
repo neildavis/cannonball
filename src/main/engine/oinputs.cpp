@@ -184,9 +184,12 @@ void OInputs::do_gear()
     // ------------------------------------------------------------------------
 
     // Automatic Gears: Don't do anything
-    if (config.controls.gear == config.controls.GEAR_AUTO)
-        return;
-
+    if (FORCE_AI ||
+        outrun.game_state == GS_ATTRACT || outrun.game_state == GS_BONUS ||
+        config.controls.gear == config.controls.GEAR_AUTO)
+    {
+        gear = (oinitengine.car_increment >> 16 > 0xA0);
+    }
     else
     {
         // Manual: Cabinet Shifter
