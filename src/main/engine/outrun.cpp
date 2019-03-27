@@ -32,6 +32,7 @@
 #include "engine/otraffic.hpp"
 #include "engine/outils.hpp"
 #include "cannonboard/interface.hpp"
+#include "realdash/realdashclient.hpp"
 
 Outrun outrun;
 
@@ -516,6 +517,7 @@ void Outrun::main_switch()
                 ohud.blit_text_new(31, 18, Utils::to_string((int) ttrial.crashes).c_str(), OHud::GREEN);
             }
             osoundint.queue_sound(sound::NEW_COMMAND);
+            realDashCanClient.resetDefaults();
             game_state = GS_GAMEOVER;
 
         case GS_GAMEOVER:

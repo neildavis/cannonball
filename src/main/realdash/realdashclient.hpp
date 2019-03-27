@@ -46,6 +46,9 @@ public:
     /** Update Gear */
     void updateGear(char gear);
     
+    /** Reset everything to default/zero states */
+    void resetDefaults();
+    
 private:
     void dbusMethodCallSync(const char *methodName);
     void dbusMethodCallUint16(const char *methodName, uint16_t value);

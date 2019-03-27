@@ -101,6 +101,15 @@ void RealDashCanClient::updateGear(char gear) {
     }
 }
 
+/** Reset everything to default/zero states */
+void RealDashCanClient::resetDefaults()
+{
+    updateRevs(0);
+    updateSpeed(0);
+    updateFuel(0);
+    updateGear(0);
+}
+
 //
 // Private methods
 //
