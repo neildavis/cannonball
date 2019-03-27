@@ -51,7 +51,7 @@ public:
     
 private:
     void dbusMethodCallSync(const char *methodName);
-    void dbusMethodCallUint16(const char *methodName, uint16_t value);
+    void dbusMethodCallIgnoreReturn(const char *methodName, int type, const void *value);
     
 private:
     DBusConnection *m_conn;

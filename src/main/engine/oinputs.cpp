@@ -15,6 +15,7 @@
 #include "engine/ostats.hpp"
 
 #include "cannonboard/interface.hpp"
+#include "realdash/realdashclient.hpp"
 
 OInputs oinputs;
 
@@ -212,6 +213,8 @@ void OInputs::do_gear()
                 gear = !gear;
         }
     }
+    // RealDash integration
+    realDashCanClient.updateGear(gear ? 2 : 1); // High = 2, Low = 1, Neutral = 0
 }
 
 // Adjust Analogue Inputs

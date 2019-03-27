@@ -72,32 +72,32 @@ void RealDashCanClient::stopServer() {
 /** Update Rev Counter RPM */
 void RealDashCanClient::updateRevs(uint16_t revsRpm) {
     if (revsRpm != m_revsRpm) {
-        dbusMethodCallUint16("setRevs", revsRpm);
         m_revsRpm = revsRpm;
+        dbusMethodCallIgnoreReturn("setRevs", DBUS_TYPE_UINT16, &m_revsRpm);
     }
 }
 
 /** Update Speed MPH */
 void RealDashCanClient::updateSpeed(uint16_t speedMph) {
     if (m_speedMph != speedMph) {
-        dbusMethodCallUint16("setSpeed", speedMph);
         m_speedMph = speedMph;
+        dbusMethodCallIgnoreReturn("setSpeed", DBUS_TYPE_UINT16, &m_speedMph);
     }
 }
 
 /** Update Fuel Level % */
 void RealDashCanClient::updateFuel(uint16_t fuelPercent) {
     if (m_fuelPercent != fuelPercent) {
-        dbusMethodCallUint16("setFuelLevel", fuelPercent);
         m_fuelPercent = fuelPercent;
+        dbusMethodCallIgnoreReturn("setFuelLevel", DBUS_TYPE_UINT16, &m_fuelPercent);
     }
 }
 
 /** Update Gear */
 void RealDashCanClient::updateGear(char gear) {
     if (m_gear != gear) {
-        // TODO: Send gear
         m_gear = gear;
+        dbusMethodCallIgnoreReturn("setGear", DBUS_TYPE_BYTE, &m_gear);
     }
 }
 
@@ -128,11 +128,15 @@ void RealDashCanClient::dbusMethodCallSync(const char *methodName) {
     DBusPendingCall* pending = nullptr;
     if (!dbus_connection_send_with_reply (m_conn, msg, &pending, -1)) {
         fprintf(stderr, "Out Of Memory!\n");
-        exit(1);
+        // free message
+        dbus_message_unref(msg);
+        return;
     }
     if (NULL == pending) {
         fprintf(stderr, "Pending Call Null\n");
-        exit(1);
+        // free message
+        dbus_message_unref(msg);
+        return;
     }
     dbus_connection_flush(m_conn);
     
@@ -144,7 +148,7 @@ void RealDashCanClient::dbusMethodCallSync(const char *methodName) {
     dbus_pending_call_unref(pending);
 }
 
-void RealDashCanClient::dbusMethodCallUint16(const char *methodName, uint16_t value) {
+void RealDashCanClient::dbusMethodCallIgnoreReturn(const char *methodName, int type, const void *value) {
     DBusMessage* msg;
     DBusMessageIter args;
     
@@ -154,20 +158,24 @@ void RealDashCanClient::dbusMethodCallUint16(const char *methodName, uint16_t va
                                        methodName); // method name
     if (NULL == msg) {
         fprintf(stderr, "Message Null\n");
-        exit(1);
+        return;
     }
     
     // append arguments
     dbus_message_iter_init_append(msg, &args);
-    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_UINT16, &value)) {
+    if (!dbus_message_iter_append_basic(&args, type, value)) {
         fprintf(stderr, "Out Of Memory!\n");
-        exit(1);
+        // free message
+        dbus_message_unref(msg);
+        return;
     }
     
     // send message (don't care about reply)
     if (!dbus_connection_send (m_conn, msg, NULL)) {
         fprintf(stderr, "Out Of Memory!\n");
-        exit(1);
+        // free message
+        dbus_message_unref(msg);
+        return;
     }
     dbus_connection_flush(m_conn);
     
