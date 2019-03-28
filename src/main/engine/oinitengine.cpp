@@ -282,16 +282,21 @@ void OInitEngine::update_engine()
     // Draw Speed & Hud Stuff
     if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_BONUS)
     {
+        // ND: Disable HUD speed since we have it in RealDash
+        /*
         // Convert & Blit Car Speed
         ohud.blit_speed(0x110CB6, car_increment >> 16);
         ohud.blit_text1(HUD_KPH1);
         ohud.blit_text1(HUD_KPH2);
+        */
         
-        // ND:
+        // ND: Convert speed to MPH for RealDash
         uint32_t kph = car_increment >> 16;
         uint32_t mph = kph * 6214 / 10000;
         realDashCanClient.updateSpeed(uint16_t(mph));
 
+        // ND: Disable HUD Gear indicator since we have it in RealDash
+        /*
         // Blit High/Low Gear
         if (config.controls.gear == config.controls.GEAR_BUTTON && !config.cannonboard.enabled)
         {
@@ -300,6 +305,7 @@ void OInitEngine::update_engine()
             else
                 ohud.blit_text_new(9, 26, "L");
         }
+         */
 
         if (config.engine.layout_debug)
             ohud.draw_debug_info(oroad.road_pos, oroad.height_lookup_wrk, trackloader.read_sprite_pattern_index());

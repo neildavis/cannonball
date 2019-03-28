@@ -361,6 +361,7 @@ void OHud::draw_rev_counter()
     uint16_t mappedRevs = outils::map(revs, 0, 319, 0, RD_MAX_REVS_RPM);
     realDashCanClient.updateRevs(mappedRevs);
     
+    /*
     revs >>= 4;
 
     uint32_t addr = 0x110DB4; // Address of rev counter
@@ -402,6 +403,7 @@ void OHud::draw_rev_counter()
         if (i & 1)
             addr += 2;
     }
+     */
     oferrari.rev_pitch2 = oferrari.rev_pitch1;
 }
 
