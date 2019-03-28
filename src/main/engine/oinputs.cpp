@@ -213,8 +213,20 @@ void OInputs::do_gear()
                 gear = !gear;
         }
     }
+    
     // RealDash integration
-    realDashCanClient.updateGear(gear ? 2 : 1); // High = 2, Low = 1, Neutral = 0
+    switch (outrun.game_state)
+    {
+        case GS_ATTRACT:
+        case GS_START1:
+        case GS_START2:
+        case GS_START3:
+        case GS_INGAME:
+            realDashCanClient.updateGear(gear ? 2 : 1); // 1 = Low, 2 = High
+            break;
+        default:
+            realDashCanClient.updateGear(0); // 0 = Neutral
+    }
 }
 
 // Adjust Analogue Inputs
