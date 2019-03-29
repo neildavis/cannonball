@@ -145,18 +145,26 @@ void OHud::draw_mini_map(uint32_t tile_addr)
 // Source: 0x8216
 void OHud::draw_timer1(uint16_t time)
 {
+    if (outrun.game_state == GS_ATTRACT)
+    {
+        // ND: Fuel 100% in RealDash during attract mode;
+        realDashCanClient.updateFuel(100);
+        return;
+    }
     if (outrun.game_state < GS_START1 || outrun.game_state > GS_INGAME)
     {
-        // ND: Fuel 100% in RealDash when not in game
-        realDashCanClient.updateFuel(100);
+        // ND: Fuel 0% in RealDash when not in game
+        realDashCanClient.updateFuel(0);
         return;
     }
 
     if (!outrun.freeze_timer)
     {
+        
         const uint16_t BASE_TILE = 0x8C80;
         draw_timer2(time, 0x1100BE, BASE_TILE);
         
+        // ND: Fuel level proportioal to time.
         // ND: time counter is in 2 nibble BCD. Fuel calulation is remaining time as percent of starting time
         uint16_t start_time_counter = ostats.TIME[config.engine.dip_time * 40]; // time to begin level with
         uint16_t start_time_secs = (start_time_counter >> 4) * 10 + (start_time_counter & 0xf);
