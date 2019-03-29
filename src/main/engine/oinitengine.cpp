@@ -280,7 +280,7 @@ void OInitEngine::update_engine()
     set_fine_position();
 
     // Draw Speed & Hud Stuff
-    if (outrun.game_state >= GS_START1 && outrun.game_state <= GS_BONUS)
+    if (outrun.game_state >= GS_ATTRACT && outrun.game_state <= GS_BONUS)
     {
         // ND: Disable HUD speed since we have it in RealDash
         /*

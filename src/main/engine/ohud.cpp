@@ -146,7 +146,11 @@ void OHud::draw_mini_map(uint32_t tile_addr)
 void OHud::draw_timer1(uint16_t time)
 {
     if (outrun.game_state < GS_START1 || outrun.game_state > GS_INGAME)
+    {
+        // ND: Fuel 100% in RealDash when not in game
+        realDashCanClient.updateFuel(100);
         return;
+    }
 
     if (!outrun.freeze_timer)
     {
@@ -350,9 +354,14 @@ void OHud::draw_stage_number(uint32_t addr, uint8_t digit, uint16_t col)
 void OHud::draw_rev_counter()
 {
     // Return in attract mode and don't draw rev counter
-    if (outrun.game_state <= GS_INIT_GAME) return;
-    uint16_t revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
-
+    // ND: We're not drawing it anyway, but let's have it active in RealDash during attract
+    uint16_t revs = 0;
+    if (outrun.game_state == GS_ATTRACT ||
+        (outrun.game_state >= GS_START1 && outrun.game_state <= GS_INGAME))
+    {
+        revs = oferrari.rev_stop_flag ? oferrari.revs_post_stop : oferrari.revs >> 16;
+    }
+    
     // Boost revs during countdown phase, so the bar goes further into the red
     if (oinitengine.car_increment >> 16 == 0)
         revs += (revs >> 2);
