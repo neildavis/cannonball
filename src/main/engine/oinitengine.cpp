@@ -782,7 +782,6 @@ void OInitEngine::init_split_next_level()
     ostats.cur_stage++;
     oroad.stage_lookup_off += 8;    // Increment lookup to next block of stages
     ostats.route_info += 0x10;      // Route Info increments by 10 at each stage
-    ohud.do_mini_map();
     init_road_seg_master();
 
     // Clear sprite palette lookup
