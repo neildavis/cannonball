@@ -38,7 +38,7 @@
          1 = 30/60 FPS. Original Game Mode.  (The original experience)
          2 = 60    FPS. Smooth Mode.         (Full 60fps)
     -->
-    <fps>2</fps>
+    <fps>0</fps>
     
     <!-- Enable FPS Counter -->
     <fps_counter>0</fps_counter>
@@ -128,25 +128,37 @@
         2 = Manual   (Separate Buttons for High/Low)
         3 = Automatic 
     -->
-    <gear>0</gear>
+    <gear>2</gear>
     
     <!-- Use the N'th joystick on the system. -->
     <pad_id>0</pad_id>
     
     <!-- Keyboard Button Configuration. Easiest to configure with inbuilt menu. -->
     <keyconfig>
+        <!-- Up Arrow -->
     	<up>1073741906</up>
-	<down>1073741905</down>
-	<left>1073741904</left>
-	<right>1073741903</right>
+        <!-- Down Arrow -->
+		<down>1073741905</down>
+        <!-- Left Arrow -->
+		<left>1073741904</left>
+        <!-- Right Arrow -->
+		<right>1073741903</right>
+		<!-- 'z' -->
         <acc>122</acc>
+		<!-- 'x' -->
         <brake>120</brake>
-        <gear1>32</gear1>
-        <gear2>32</gear2>
-        <start>49</start>
-        <coin>53</coin>
-        <menu>286</menu>
-        <view>304</view>
+        <!-- Left Ctrl -->
+        <gear1>1073742048</gear1>
+        <!-- Left Alt -->
+        <gear2>1073742050</gear2>
+		<!-- 's' -->
+        <start>115</start>
+		<!-- 'c' -->
+        <coin>99</coin>
+		<!-- 'm' -->
+        <menu>109</menu>
+		<!-- 'v' -->
+        <view>118</view>
     </keyconfig>
     
     <!-- Gamepad / Joystick Button Configuration. Easiest to configure with inbuilt menu. -->
@@ -246,7 +258,7 @@
     <traffic>1</traffic>
     
     <!-- Freeplay Mode -->
-    <freeplay>0</freeplay>
+    <freeplay>1</freeplay>
     
     <!-- The original Japanese release of OutRun featured slightly different
          tracks and course ordering. 
