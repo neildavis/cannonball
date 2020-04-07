@@ -558,12 +558,12 @@ void OFerrari::set_ferrari_palette()
     // Denote palette for brake light
     if (oinputs.brake_adjust >= OInputs::BRAKE_THRESHOLD1)
     {
-        outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
+        // [ND] outrun.outputs->set_digital(OOutputs::D_BRAKE_LAMP);
         pal = 2;
     }
     else
     {
-        outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
+        // [ND] outrun.outputs->clear_digital(OOutputs::D_BRAKE_LAMP);
         pal = 0;
     }
 

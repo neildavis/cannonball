@@ -210,8 +210,10 @@ static void tick()
             break;
     }
     // Write CannonBoard Outputs
+    /* [ND] Not needed
     if (config.cannonboard.enabled)
         cannonboard.write(outrun.outputs->dig_out, outrun.outputs->hw_motor_control);
+    */
 
     // Draw SDL Video
     video.draw_frame();  
