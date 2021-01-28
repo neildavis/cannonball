@@ -94,10 +94,10 @@ void RealDashCanClient::updateFuel(uint16_t fuelPercent) {
 }
 
 /** Update Gear */
-void RealDashCanClient::updateGear(char gear) {
+void RealDashCanClient::updateGear(uint16_t gear) {
     if (m_gear != gear) {
         m_gear = gear;
-        dbusMethodCallIgnoreReturn("setGear", DBUS_TYPE_BYTE, &m_gear);
+        dbusMethodCallIgnoreReturn("setGear", DBUS_TYPE_UINT16, &m_gear);
     }
 }
 

@@ -44,7 +44,7 @@ public:
     void updateFuel(uint16_t fuelPercent);
     
     /** Update Gear */
-    void updateGear(char gear);
+    void updateGear(uint16_t gear);
     
     /** Reset everything to default/zero states */
     void resetDefaults();
@@ -59,7 +59,7 @@ private:
     uint16_t m_revsRpm;
     uint16_t m_speedMph;
     uint16_t m_fuelPercent;
-    char m_gear;
+    uint16_t m_gear;
 };
 
 extern RealDashCanClient realDashCanClient;
