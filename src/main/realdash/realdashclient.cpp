@@ -71,8 +71,10 @@ void RealDashCanClient::stopServer() {
 
 /** Update Rev Counter RPM */
 void RealDashCanClient::updateRevs(uint16_t revsRpm) {
-    if (revsRpm != m_revsRpm) {
-        m_revsRpm = revsRpm;
+    // Since OutRun tops out ~7137 revs and we want up to 8000 on RealDash, we make a linear adjustment
+    uint16_t adjustedRevsRpm = (revsRpm * 9) / 8;    // 1.125
+    if (adjustedRevsRpm != m_revsRpm) {
+        m_revsRpm = adjustedRevsRpm;
         dbusMethodCallIgnoreReturn("setRevs", DBUS_TYPE_UINT16, &m_revsRpm);
     }
 }
