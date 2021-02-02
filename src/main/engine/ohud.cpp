@@ -143,15 +143,23 @@ void OHud::draw_mini_map(uint32_t tile_addr)
 // Source: 0x8216
 void OHud::draw_timer1(uint16_t time)
 {
-    if (outrun.game_state < GS_START1)
+    if (outrun.game_state < GS_INIT_BEST1)
     {
-        // ND: Fuel 100% in RealDash during start, attract mode & music screen;
-        realDashCanClient.updateFuel(100);
+        // ND: Fuel in attract mode based on attract mode duration
+        uint16_t start_time_secs = config.engine.new_attract ? 0x80 : 0x15;
+        uint16_t remain_time_secs = ostats.time_counter;
+        uint16_t fuel_percent = std::min(100, remain_time_secs * 100 / start_time_secs);
+        realDashCanClient.updateFuel(fuel_percent);
     }
-    else if (outrun.game_state > GS_INGAME)
+    else if (outrun.game_state < GS_INIT_MUSIC || outrun.game_state > GS_INGAME)
     {
-        // ND: Fuel 0% in RealDash in post game modes
+        // ND: Fuel 0% in RealDash in pre & post game modes (hi-scores)
         realDashCanClient.updateFuel(0);
+    }
+    else if (outrun.game_state < GS_START1)
+    {
+        // ND: Fuel 100% in RealDash during start & music screen;
+        realDashCanClient.updateFuel(100);
     }
     else if (!outrun.freeze_timer)
     {
